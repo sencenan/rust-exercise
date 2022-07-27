@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 pub fn smallest_trimmed_numbers(ss: Vec<String>, queries: Vec<Vec<i32>>) -> Vec<i32> {
-  let mut sorted = HashMap::new();
+  let mut sorted: HashMap<_, Vec<i32>> = HashMap::new();
   let num_len = ss[0].len();
   let xs: Vec<_> = ss.iter().map(|x| x.clone().into_bytes()).collect();
 
@@ -29,18 +29,13 @@ pub fn smallest_trimmed_numbers(ss: Vec<String>, queries: Vec<Vec<i32>>) -> Vec<
       Ordering::Equal
     });
 
-    res
+    res.iter().map(|&(idx, _)| idx).collect()
   };
 
   queries
     .iter()
-    .map(|query| {
-      let k = query[0] as usize;
-      let trim = query[1];
-
-      let (idx, _) = sorted.entry(trim).or_insert_with(|| trim_and_sort(trim))[k - 1];
-      idx
-    })
+    .map(|query| (query[0] as usize, query[1]))
+    .map(|(k, trim)| sorted.entry(trim).or_insert_with(|| trim_and_sort(trim))[k - 1])
     .collect()
 }
 
